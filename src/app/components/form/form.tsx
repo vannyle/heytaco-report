@@ -10,7 +10,8 @@ function Form() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
 
-  const sendReport = async () => {
+  const sendReport = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
     setStatus("");
 
