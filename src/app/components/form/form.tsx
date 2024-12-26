@@ -10,7 +10,7 @@ function Form() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
 
-  const sendReport = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setStatus("");
@@ -23,7 +23,7 @@ function Form() {
       });
 
       if (response.ok) {
-        setStatus("Report sent successfully to Slack!");
+        setStatus("Report sent successfully to DM!");
       } else {
         const error = await response.json();
         setStatus(`Error: ${error.error}`);
@@ -37,16 +37,17 @@ function Form() {
   };
 
 
+
   return (
-    <form onSubmit={sendReport}>
+    <form className="relative w-full flex flex-col gap-4" onSubmit={handleSubmit}>
       <textarea
-        className="w-full p-2 border border-gray-700 rounded mb-4 bg-black/30 text-white"
+        className="p-2 border border-gray-700 rounded mb-4 bg-black/30 text-white"
         value={customText}
         onChange={(e) => setCustomText(e.target.value)}
         rows={8}
       />
        <textarea
-        className="w-full p-2 border border-gray-700 rounded mb-4 bg-black/30 text-white"
+        className="p-2 border border-gray-700 rounded mb-4 bg-black/30 text-white"
         value={additionalText}
         onChange={(e) => setAdditionalText(e.target.value)}
         rows={3}
@@ -59,7 +60,7 @@ function Form() {
       >
         {loading ? "Sending..." : "Send Weekly Report"}
       </button>
-      {status && <p className="mt-4 text-green-600">{status}</p>}
+      {status && <p className="mt-4 text-green-600 absolute top-full">{status}</p>}
     </form>
   );
 }
