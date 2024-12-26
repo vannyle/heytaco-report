@@ -16,22 +16,29 @@ interface LeaderboardUser {
 
 async function getHeyTacoLeaderboard(days: number = 7) {
   const url = `${HEYTACO_API_URL}?days=${days}`;
-  const response = await fetch(url);
-  
-  const responseBody = await response.text(); // Log as text for debugging
-  console.log("API Response:", responseBody);
+  const response = await fetch(url, {
+    headers: {
+      Referer: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000", // Set your app's URL
+    },
+  });
 
+  const text = await response.text(); // Fetch response as text for debugging
   if (!response.ok) {
+    console.error("HeyTaco Error Response:", text); // Log the full error response
+    if (text.includes("Sign in")) {
+      throw new Error("Authentication required. Check HeyTaco settings and Referer header.");
+    }
     throw new Error(`Failed to fetch leaderboard: ${response.statusText}`);
   }
 
   try {
-    return JSON.parse(responseBody).leaderboard;
-  } catch (err) {
-    console.log(err);
-    throw new Error(`Invalid JSON response: ${responseBody}`);
+    return JSON.parse(text).leaderboard;
+  } catch (error) {
+    console.error("Error parsing JSON:", error);
+    throw new Error(`Invalid JSON response from HeyTaco: ${text}`);
   }
 }
+
 
 async function postToSlack(message: string) {
   try {
