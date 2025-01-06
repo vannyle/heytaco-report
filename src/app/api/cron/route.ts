@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
 
     // List top taco receivers
     leaderboard.forEach((user: LeaderboardUser, index: number) => {
-      message += `\n${index + 1}. <@${user.username}> - ${user.sum} tacos`;
+      message += `\n${index + 1}. <@${user.username}> - ${user.sum} ${user.sum === "1" ? "taco" : "tacos"}`;
     });
 
     // Add footer text
