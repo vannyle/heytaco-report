@@ -55,12 +55,12 @@ async function postToSlack(message: string) {
   }
 }
 
-export async function GET(req: NextRequest) {
-    // Authorization check
-    const authHeader = req.headers.get("Authorization");
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+export async function POST(req: NextRequest) {
+  // Authorization check
+  const authHeader = req.headers.get("Authorization");
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
     
   try {
     const { headerText, footerText } = await req.json(); // Accept custom text from the request body
@@ -85,4 +85,17 @@ export async function GET(req: NextRequest) {
     console.error("Error in report generation:", error);
     return NextResponse.json({ success: false, error: "Failed to generate report." }, { status: 500 });
   }
+}
+
+// get query that calls the POST function with default parameters
+export async function GET() {
+  const domain = process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost';
+  const mockRequest = new Request(`${domain}`, {
+    method: 'POST',
+    body: JSON.stringify({
+      headerText: "🌮 *Weekly HeyTaco Report* 🌮\n\n*Top Taco Receivers:*",
+      footerText: "\nGreat job, team! 🎉"
+    })
+  });
+  return POST(new NextRequest(mockRequest));
 }
