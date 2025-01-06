@@ -58,7 +58,7 @@ async function postToSlack(message: string) {
 
 export async function POST(req: NextRequest) {
   // Authorization check
-  const authHeader = req.headers.get("Authorization");
+  const authHeader = req.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
