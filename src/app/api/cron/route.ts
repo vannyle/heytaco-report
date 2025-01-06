@@ -55,7 +55,7 @@ async function postToSlack(message: string) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
     // Authorization check
     const authHeader = req.headers.get("Authorization");
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
