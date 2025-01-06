@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 // import axios from "axios";
 import { WebClient } from "@slack/web-api";
+import { defaultFooterText, defaultHeaderText } from "src/app/utils/constants";
 
 const HEYTACO_API_URL = "https://www.heytaco.chat/api/v1/json/leaderboard/TH7M78TD1";
 const SLACK_TOKEN = process.env.SLACK_BOT_TOKEN;
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
     const leaderboard = await getHeyTacoLeaderboard(7);
 
     // Add header text
-    let message = headerText || "🌮 *Weekly HeyTaco Report* 🌮\n\n*Top Taco Receivers:*"; 
+    let message = headerText || defaultHeaderText; 
 
     // List top 3 taco receivers
     leaderboard.slice(0, 3).forEach((user: LeaderboardUser, index: number) => {
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Add footer text
-    message += footerText ? "\n" + footerText : "\nGreat job, team! 🎉";
+    message += footerText ? "\n" + footerText : "\n" + defaultFooterText;
     
     // Post to Slack  
     await postToSlack(message);
@@ -93,8 +94,8 @@ export async function GET() {
   const mockRequest = new Request(`${domain}`, {
     method: 'POST',
     body: JSON.stringify({
-      headerText: "🌮 *Weekly HeyTaco Report* 🌮\n\n*Top Taco Receivers:*",
-      footerText: "\nGreat job, team! 🎉"
+      headerText: defaultHeaderText,
+      footerText: defaultFooterText
     })
   });
   return POST(new NextRequest(mockRequest));

@@ -1,14 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { defaultFooterText, defaultHeaderText } from "src/app/utils/constants";
 
 function Form() {
-  const [headerText, setHeaderText] = useState(
-     "🌮 *Weekly HeyTaco Report* 🌮\n\n*Top Taco Receivers:*"
-  );
-  const [footerText, setFooterText] = useState("Great job, team! 🎉");
+  const [headerText, setHeaderText] = useState(defaultHeaderText);
+  const [footerText, setFooterText] = useState(defaultFooterText);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const cachedHeaderText = localStorage.getItem("headerText");
+    const cachedFooterText = localStorage.getItem("footerText");
+
+    if (cachedHeaderText) setHeaderText(cachedHeaderText);
+    if (cachedFooterText) setFooterText(cachedFooterText);
+  }, []); 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,6 +35,8 @@ function Form() {
 
       if (response.ok) {
         setStatus("Report sent successfully to DM!");
+        setHeaderText(headerText);
+        setFooterText(footerText);
       } else {
         const error = await response.json();
         setStatus(`Error: ${error.error}`);
