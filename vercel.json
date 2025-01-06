@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "api/cron/route.ts": {
-      "runtime": "nodejs16.x"
-    }
-  },
   "crons": [
     {
       "path": "/api/cron",
