@@ -69,8 +69,8 @@ export async function GET(req: NextRequest) {
     // Add header text
     let message = headerText || "🌮 *Weekly HeyTaco Report* 🌮\n\n*Top Taco Receivers:*"; 
 
-    // List top taco receivers
-    leaderboard.forEach((user: LeaderboardUser, index: number) => {
+    // List top 3 taco receivers
+    leaderboard.slice(0, 3).forEach((user: LeaderboardUser, index: number) => {
       message += `\n${index + 1}. <@${user.username}> - ${user.sum} ${user.sum === "1" ? "taco" : "tacos"}`;
     });
 
