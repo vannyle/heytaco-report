@@ -3,10 +3,10 @@
 import { useState } from "react";
 
 function Form() {
-  const [customText, setCustomText] = useState(
+  const [headerText, setHeaderText] = useState(
      "🌮 *Weekly HeyTaco Report* 🌮\n\n*Top Taco Receivers:*"
   );
-  const [additionalText, setAdditionalText] = useState("Great job, team! 🎉");
+  const [footerText, setFooterText] = useState("Great job, team! 🎉");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
 
@@ -18,7 +18,7 @@ function Form() {
       const response = await fetch("/api/taco-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customText, additionalText }),
+        body: JSON.stringify({ headerText, footerText }),
       });
 
       if (response.ok) {
@@ -39,18 +39,18 @@ function Form() {
 
   return (
     <form className="relative w-full flex flex-col gap-4" onSubmit={handleSubmit}>
-      <label htmlFor="customText">Message Header</label>
+      <label htmlFor="headerText">Message Header</label>
       <textarea
         className="p-2 border border-gray-700 rounded mb-4 bg-black/30 text-white"
-        value={customText}
-        onChange={(e) => setCustomText(e.target.value)}
+        value={headerText}
+        onChange={(e) => setHeaderText(e.target.value)}
         rows={3}
       />
-       <label htmlFor="additionalText">Message Footer</label>
+       <label htmlFor="footerText">Message Footer</label>
        <textarea
         className="p-2 border border-gray-700 rounded mb-4 bg-black/30 text-white"
-        value={additionalText}
-        onChange={(e) => setAdditionalText(e.target.value)}
+        value={footerText}
+        onChange={(e) => setFooterText(e.target.value)}
         rows={3}
         placeholder="Additional text after top receivers"
       />

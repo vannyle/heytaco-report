@@ -55,13 +55,19 @@ async function postToSlack(message: string) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
+    // Authorization check
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    
   try {
-    const { customText, additionalText } = await req.json(); // Accept custom text from the request body
+    const { headerText, footerText } = await req.json(); // Accept custom text from the request body
     const leaderboard = await getHeyTacoLeaderboard(7);
 
     // Add header text
-    let message = customText || "🌮 *Weekly HeyTaco Report* 🌮\n\n*Top Taco Receivers:*"; 
+    let message = headerText || "🌮 *Weekly HeyTaco Report* 🌮\n\n*Top Taco Receivers:*"; 
 
     // List top taco receivers
     leaderboard.forEach((user: LeaderboardUser, index: number) => {
@@ -69,7 +75,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Add footer text
-    message += additionalText ? "\n" + additionalText : "\nGreat job, team! 🎉";
+    message += footerText ? "\n" + footerText : "\nGreat job, team! 🎉";
     
     // Post to Slack  
     await postToSlack(message);
