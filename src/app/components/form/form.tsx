@@ -4,14 +4,13 @@ import { useState } from "react";
 
 function Form() {
   const [customText, setCustomText] = useState(
-     "🌮 *Weekly HeyTaco Report* 🌮\n\n*Top Taco Receivers:*\n1. User1 - 10 tacos\n2. User2 - 8 tacos\n3. User3 - 7 tacos\n"
+     "🌮 *Weekly HeyTaco Report* 🌮\n\n*Top Taco Receivers:*"
   );
   const [additionalText, setAdditionalText] = useState("Great job, team! 🎉");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setLoading(true);
     setStatus("");
 
@@ -40,12 +39,14 @@ function Form() {
 
   return (
     <form className="relative w-full flex flex-col gap-4" onSubmit={handleSubmit}>
+      <label htmlFor="customText">Message Header</label>
       <textarea
         className="p-2 border border-gray-700 rounded mb-4 bg-black/30 text-white"
         value={customText}
         onChange={(e) => setCustomText(e.target.value)}
-        rows={8}
+        rows={3}
       />
+       <label htmlFor="additionalText">Message Footer</label>
        <textarea
         className="p-2 border border-gray-700 rounded mb-4 bg-black/30 text-white"
         value={additionalText}

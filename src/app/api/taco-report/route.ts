@@ -4,6 +4,7 @@ import { WebClient } from "@slack/web-api";
 
 const HEYTACO_API_URL = "https://www.heytaco.chat/api/v1/json/leaderboard/TH7M78TD1";
 const SLACK_TOKEN = process.env.SLACK_BOT_TOKEN;
+const HEYTACO_COOKIE = process.env.HEYTACO_COOKIE;
 // const SLACK_CHANNEL = "#general";
 const SLACK_CHANNEL = "#heytaco-report-test";
 
@@ -14,31 +15,34 @@ interface LeaderboardUser {
   sum: string;
 }
 
-async function getHeyTacoLeaderboard(days: number = 7) {
+async function getHeyTacoLeaderboard(days: number = 1) {
   const url = `${HEYTACO_API_URL}?days=${days}`;
-  const response = await fetch(url, {
-    headers: {
-      Referer: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000", // Set your app's URL
-    },
-  });
 
-  const text = await response.text(); // Fetch response as text for debugging
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Cookie': HEYTACO_COOKIE as string, 
+    }
+  });
+  const json = await response.json();
+  
+
   if (!response.ok) {
-    console.error("HeyTaco Error Response:", text); // Log the full error response
-    if (text.includes("Sign in")) {
+    console.error("HeyTaco Error Response:", json); // Log the full error response
+    if (json.includes("Sign in")) {
       throw new Error("Authentication required. Check HeyTaco settings and Referer header.");
     }
     throw new Error(`Failed to fetch leaderboard: ${response.statusText}`);
   }
 
   try {
-    return JSON.parse(text).leaderboard;
+    return json?.leaderboard;
   } catch (error) {
     console.error("Error parsing JSON:", error);
-    throw new Error(`Invalid JSON response from HeyTaco: ${text}`);
+    throw new Error(`Invalid JSON response from HeyTaco: ${json}`);
   }
 }
-
 
 async function postToSlack(message: string) {
   try {
@@ -53,17 +57,20 @@ async function postToSlack(message: string) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { customText } = await req.json(); // Accept custom text from the request body
+    const { customText, additionalText } = await req.json(); // Accept custom text from the request body
     const leaderboard = await getHeyTacoLeaderboard(7);
 
-    // Create the Slack message
-    let message = customText || "🌮 *Weekly HeyTaco Report* 🌮\n\n*Top Taco Receivers:*\n1. User1 - 10 tacos\n2. User2 - 8 tacos\n3. User3 - 7 tacos\n";
-    message += "*Top Taco Receivers:*\n";
-    leaderboard.forEach((user: LeaderboardUser, index: number) => {
-      message += `${index + 1}. ${user.username} - ${user.sum} tacos\n`;
-    });
-    message += "\nGreat job, team! 🎉";
+    // Add header text
+    let message = customText || "🌮 *Weekly HeyTaco Report* 🌮\n\n*Top Taco Receivers:*"; 
 
+    // List top taco receivers
+    leaderboard.forEach((user: LeaderboardUser, index: number) => {
+      message += `\n${index + 1}. <@${user.username}> - ${user.sum} tacos`;
+    });
+
+    // Add footer text
+    message += additionalText ? "\n" + additionalText : "\nGreat job, team! 🎉";
+    
     // Post to Slack  
     await postToSlack(message);
 
