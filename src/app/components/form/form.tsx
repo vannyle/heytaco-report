@@ -10,12 +10,13 @@ function Form() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
     setStatus("");
 
     try {
-      const response = await fetch("/api/taco-report", {
+      const response = await fetch("/api/cron", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ headerText, footerText }),
