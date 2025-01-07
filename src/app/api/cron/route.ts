@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
     // Generate leaderboard message
     leaderboard.slice(0, topCount).forEach(group => {
       const users = group.users.map(user => `<@${user.username}>`).join(' ');
-      message += `\n${group.rank}. ${users} - ${group.sum} тако`;
+      message += `\n${group.rank}. ${users} — ${group.sum} тако`;
     });
 
     // Add footer text
