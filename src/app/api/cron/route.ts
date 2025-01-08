@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
     // Add header text
     let message = headerText || defaultHeaderText;
     const topCount = leaderboard.slice(0, 10).length;
-    message += `🏆 *ТОП-${topCount} по количеству полученных тако:*`;
+    message += `🏆 *ТОП-${topCount} таколидеров:*`;
 
     // Generate leaderboard message
     leaderboard.slice(0, topCount).forEach(group => {
