@@ -7,8 +7,8 @@ import { defaultFooterText, defaultHeaderText } from "src/app/utils/constants";
 const HEYTACO_API_URL = "https://www.heytaco.chat/api/v1/json/leaderboard/TH7M78TD1";
 const SLACK_TOKEN = process.env.SLACK_BOT_TOKEN;
 const HEYTACO_COOKIE = process.env.HEYTACO_COOKIE;
-const SLACK_CHANNEL = "#general";
-// const SLACK_CHANNEL = "#heytaco-report-test";
+// const SLACK_CHANNEL = "#general";
+const SLACK_CHANNEL = "#heytaco-report-test";
 
 const client = new WebClient(SLACK_TOKEN);
 
@@ -102,7 +102,6 @@ async function getHeyTacoLeaderboard(days: number = 1) {
 async function postToSlack(message: string) {
   // Read the current counter
   const imageCounter = readImageCounter();
-  console.log("imageCounter", imageCounter);
   try {
     await client.chat.postMessage({
       channel: SLACK_CHANNEL,
@@ -122,6 +121,7 @@ async function postToSlack(message: string) {
   }
 
 export async function POST(req: NextRequest) {
+  console.log('[%s] Cron Triggered', new Date().toISOString());
   try {
     const { headerText, footerText } = await req.json();
     const leaderboard = await getHeyTacoLeaderboard(7);
@@ -151,7 +151,14 @@ export async function POST(req: NextRequest) {
 }
 
 // get query that calls the POST function with default parameters
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response('Unauthorized', {
+      status: 401,
+    });
+  }
+  
   const domain = process.env.NEXT_PUBLIC_DOMAIN || 'http://localhost';
   const mockRequest = new Request(`${domain}`, {
     method: 'POST',
