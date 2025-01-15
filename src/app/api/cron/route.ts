@@ -1,5 +1,3 @@
-import path from "path";
-import fs from "fs";
 import { NextRequest, NextResponse } from "next/server";
 import { WebClient } from "@slack/web-api";
 import { defaultFooterText, defaultHeaderText } from "src/app/utils/constants";
@@ -17,8 +15,6 @@ interface LeaderboardUser {
   sum: string;
 }
 
-const IMAGE_COUNTER_PATH = path.resolve("src/app/utils/image-counter.json");
-
 const imageUrls = [
   '/images/image-1.png',
   '/images/image-2.png',
@@ -30,25 +26,9 @@ const imageUrls = [
   '/images/image-8.png',
 ]
 
-function readImageCounter(): number {
-  try {
-    const data = fs.readFileSync(IMAGE_COUNTER_PATH, "utf-8");
-    const { counter } = JSON.parse(data);
-    return counter;
-  } catch (error) {
-    console.error("Failed to read image counter:", error);
-    return 0; // Default to 0 if there's an issue
-  }
-}
-
-function updateImageCounter(counter: number): void {
-  try {
-    // Reset counter to 0 if it reaches the end of imageUrls array
-    const nextCounter = (counter + 1) >= imageUrls.length ? 0 : counter + 1;
-    fs.writeFileSync(IMAGE_COUNTER_PATH, JSON.stringify({ counter: nextCounter }), "utf-8");
-  } catch (error) {
-    console.error("Failed to update image counter:", error);
-  }
+function getRandomImageIndex(): number {
+  const n = imageUrls.length;
+  return Math.floor(Math.random() * n);
 }
 
 async function getHeyTacoLeaderboard(days: number = 1) {
@@ -101,7 +81,7 @@ async function getHeyTacoLeaderboard(days: number = 1) {
 }
 async function postToSlack(message: string) {
   // Read the current counter
-  const imageCounter = readImageCounter();
+  const imageCounter = getRandomImageIndex();
   try {
     await client.chat.postMessage({
       channel: SLACK_CHANNEL,
@@ -113,8 +93,6 @@ async function postToSlack(message: string) {
           },
         ],
       });
-
-      updateImageCounter(imageCounter);
     } catch (error) {
       console.error(`Failed to send message:`, error);
     }
@@ -154,6 +132,7 @@ export async function POST(req: NextRequest) {
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    console.log('[%s] Unauthorized', new Date().toISOString());
     return new Response('Unauthorized', {
       status: 401,
     });
