@@ -5,8 +5,8 @@ import { defaultFooterText, defaultHeaderText } from "src/app/utils/constants";
 const HEYTACO_API_URL = "https://www.heytaco.chat/api/v1/json/leaderboard/TH7M78TD1";
 const SLACK_TOKEN = process.env.SLACK_BOT_TOKEN;
 const HEYTACO_COOKIE = process.env.HEYTACO_COOKIE;
-// const SLACK_CHANNEL = "#general";
-const SLACK_CHANNEL = "#heytaco-report-test";
+const SLACK_CHANNEL = "#general";
+// const SLACK_CHANNEL = "#heytaco-report-test";
 
 const client = new WebClient(SLACK_TOKEN);
 
